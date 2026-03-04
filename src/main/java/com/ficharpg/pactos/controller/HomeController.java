@@ -11,5 +11,5 @@ public class HomeController {
     public String redirecionarParaHome() {
         // Redireciona automaticamente para o home.html
         return "redirect:/home.html";
-    }
+    };
 }

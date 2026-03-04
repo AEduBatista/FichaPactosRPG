@@ -51,7 +51,7 @@ Este projeto é uma aplicação *Full-Stack* construída com arquitetura moderna
 
 ---
 
-## 🚀 Como Executar o Projeto Localmente
+## 🚀 Como Executar o Projeto Localmente (FUTURAMENTE ABERTO AO PÚBLICO)
 
 Para rodar este projeto na sua máquina para testes ou para mestrar uma sessão:
 

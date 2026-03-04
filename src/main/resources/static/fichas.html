@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACTOS RPG - Meus Agentes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #121212; 
+            color: #e0e0e0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; padding: 0;
+        }
+
+        /* HEADER PRINCIPAL */
+        .pactos-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 30px;
+            background-color: #1a1a1a;
+            border-bottom: 2px solid #333;
+        }
+        
+        .pactos-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #ffffff;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); /* Brilho roxo */
+        }
+
+        /* Espaço da foto de perfil (vazio agora) */
+        .profile-pic-placeholder {
+            width: 45px; height: 45px;
+            background-color: #333;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .profile-pic-placeholder:hover {
+            border-color: #a855f7; /* Borda roxa no hover */
+            transform: scale(1.1);
+        }
+
+        /* BARRA DE ABAS (Agentes / Campanhas) */
+        .pactos-nav {
+            background-color: #212121;
+            padding: 0 30px;
+            border-bottom: 1px solid #333;
+        }
+        .nav-link {
+            color: #888;
+            font-weight: 600;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            transition: 0.2s;
+        }
+        .nav-link.active {
+            color: white;
+            border-bottom: 3px solid #a855f7; /* Cor de acento ativa */
+        }
+        .nav-link:hover:not(.active) {
+            color: #ddd;
+        }
+        .nav-link.inactive {
+            color: #555; /* Cor para aba futura */
+            cursor: default;
+        }
+
+        /* CONTEÚDO PRINCIPAL (Grade de Fichas) */
+        .pactos-main {
+            padding: 30px;
+        }
+
+        /* BARRA DE AÇÕES SUPERIOR */
+        .action-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px;
+        }
+        .agentes-count { font-size: 1.1rem; color: #aaa; }
+        .search-line { 
+            border: none; border-bottom: 1px solid #555; background: transparent; color: white; border-radius: 0; padding-left: 0; width: 250px; 
+            outline: none;
+        }
+        .search-line:focus { border-color: #a855f7; }
+
+        /* Botão Novo Agente */
+        .btn-purple { 
+            background-color: #a855f7; color: white; border: none; font-weight: bold; 
+            transition: 0.3s;
+        }
+        .btn-purple:hover { background-color: #9333ea; color: white; transform: scale(1.05); }
+
+     /* CARDS DE FICHAS (Novo Layout) */
+        .fichas-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;
+        }
+        
+        .ficha-card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: 0.3s;
+            position: relative;
+            height: 250px; /* Altura fixa para formar o quadrado */
+            /* Imagem de fundo padrão simulando a foto do personagem */
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.9)), url('https://via.placeholder.com/300x300/2a2a2a/111111?text=+');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end; /* Joga o texto para a base da carta */
+            padding: 20px;
+        }
+        .ficha-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.6); border-color: #a855f7; }
+
+        /* Texto da carta (Nome, Nível, Origem) */
+        .ficha-info { transition: opacity 0.3s; width: 100%; pointer-events: none; }
+        .ficha-name-new { font-size: 1.4rem; font-weight: 800; color: white; margin-bottom: 2px; text-shadow: 2px 2px 4px black; }
+        .ficha-sub-new { font-size: 0.9rem; color: #ccc; text-shadow: 1px 1px 3px black; }
+
+        /* Camada escura com botões que aparece ao passar o mouse */
+        .ficha-hover-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(18, 18, 18, 0.85);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .ficha-card:hover .ficha-info { opacity: 0; } /* Esconde texto original */
+        .ficha-card:hover .ficha-hover-overlay { opacity: 1; } /* Mostra botões */
+
+        .btn-overlay { width: 70%; font-weight: bold; }
+
+        /* Card Vazio para Novo Agente */
+        .ficha-card.novo-card {
+            background-image: none;
+            background-color: #151515; border: 2px dashed #333; cursor: pointer; color: #666;
+            flex-direction: column; justify-content: center; align-items: center; gap: 10px; padding: 0;
+        }
+        .ficha-card.novo-card:hover { border-color: #a855f7; color: #a855f7; background-color: #1a1a1a; transform: translateY(-5px); }
+        .ficha-card.novo-card svg { width: 40px; height: 40px; }
+    </style>
+</head>
+<body>
+
+    <header class="pactos-header">
+        <div class="pactos-logo">PACTOS RPG</div>
+       <div class="d-flex align-items-center">
+    
+        <button onclick="fazerLogout()" class="btn btn-outline-danger btn-sm me-3" style="border-radius: 8px;">
+            Sair
+        </button>
+
+          <a href="perfil.html"> <div class="profile-circle"></div> </a>
+
+       </div>
+        
+    </header>
+
+    <nav class="pactos-nav">
+        <div class="d-flex gap-2">
+            <button class="nav-link active">Agentes</button>
+            <button class="nav-link inactive" disabled>Campanhas (Em breve)</button>
+        </div>
+    </nav>
+
+    <main class="pactos-main">
+        
+        <div class="action-bar">
+            <div class="agentes-count" id="contador-agentes">Agentes: 0/15</div>
+            <div class="d-flex gap-3 align-items-center">
+                <input type="text" class="search-line" placeholder="Filtrar agentes...">
+                <button class="btn btn-purple" onclick="criarAgente()">Novo Agente</button>
+            </div>
+        </div>
+
+        <div class="fichas-grid" id="grid-fichas">
+            
+            <div class="ficha-card novo-card" id="btn-add-card" onclick="criarAgente()">
+                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"></path></svg>
+                 <div>Criar Novo Agente</div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const maxAgentes = 15;
+    let totalAgentes = 0;
+
+    // Pega o nome do jogador que salvamos na hora do login!
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+
+    if (!usuarioLogado) {
+        alert("Você precisa estar logado!");
+        window.location.href = "login.html";
+    }
+
+    function atualizarContador() {
+        document.getElementById('contador-agentes').innerText = `Agentes: ${totalAgentes}/${maxAgentes}`;
+    }
+
+    // Carrega as fichas do banco de dados ao abrir a página
+    async function carregarFichas() {
+        try {
+            const resposta = await fetch(`/api/agentes/listar/${usuarioLogado}`);
+            const agentes = await resposta.json();
+
+            totalAgentes = agentes.length;
+            atualizarContador();
+
+            // Renderiza cada agente salvo no banco
+            agentes.forEach(agente => renderizarCarta(agente));
+        } catch (erro) {
+            console.error("Erro ao carregar agentes:", erro);
+        }
+    }
+
+    // Cria a carta visualmente no HTML
+    function renderizarCarta(agente) {
+        const cardId = `agente-${agente.id}`;
+        const novoAgenteHTML = `
+            <div class="ficha-card" id="${cardId}">
+                <div class="ficha-info">
+                    <div class="ficha-name-new">${agente.nome}</div>
+                    <div class="ficha-sub-new">Nível ${agente.nivel} • ${agente.origem}</div>
+                </div>
+                <div class="ficha-hover-overlay">
+                    <a href="index.html?id=${agente.id}" class="btn btn-purple btn-overlay">Entrar na Ficha</a>
+                    <button class="btn btn-danger btn-overlay" onclick="excluirAgente(${agente.id}, event)">Excluir</button>
+                </div>
+            </div>
+        `;
+        const btnAddCard = document.getElementById('btn-add-card');
+        btnAddCard.insertAdjacentHTML('beforebegin', novoAgenteHTML);
+    }
+
+    // Pede pro Java criar uma ficha nova no banco
+    async function criarAgente() {
+        if (totalAgentes >= maxAgentes) {
+            alert("Limite máximo de agentes atingido!");
+            return;
+        }
+
+        try {
+            const resposta = await fetch(`/api/agentes/criar/${usuarioLogado}`, { method: 'POST' });
+            if (resposta.ok) {
+                const novoAgente = await resposta.json();
+                renderizarCarta(novoAgente);
+                totalAgentes++;
+                atualizarContador();
+            }
+        } catch (erro) {
+            console.error("Erro ao criar agente:", erro);
+        }
+    }
+
+    // Pede pro Java excluir do banco
+    async function excluirAgente(id, event) {
+        event.stopPropagation();
+        if(confirm("Os registros deste pacto serão apagados. Tem certeza que deseja excluir?")) {
+            try {
+                await fetch(`/api/agentes/excluir/${id}`, { method: 'DELETE' });
+                document.getElementById(`agente-${id}`).remove();
+                totalAgentes--;
+                atualizarContador();
+            } catch (erro) {
+                console.error("Erro ao excluir:", erro);
+            }
+        }
+    }
+
+    // Função para deslogar do sistema de forma segura
+    function fazerLogout() {
+        if(confirm("Tem certeza que deseja sair da sua conta?")) {
+            localStorage.removeItem('usuarioLogado'); // Apaga a memória do navegador
+            window.location.href = "login.html"; // Manda de volta pra tela de login
+        }
+    }
+
+    // Inicia tudo assim que a página abre
+    carregarFichas();
+    
+    </script>
+</body>
+</html>

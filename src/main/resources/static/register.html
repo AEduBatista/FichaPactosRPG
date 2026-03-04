@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACTOS RPG - Registrar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        body { 
+            background-color: #121212; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; padding: 20px 0;
+        }
+        .auth-card {
+            background-color: #1e1e1e; padding: 40px; border-radius: 10px; border: 1px solid #333;
+            width: 100%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .auth-title { color: #ffffff; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); text-align: center; margin-bottom: 30px; font-weight: bold; }
+        .form-control:focus { border-color: #a855f7; box-shadow: 0 0 5px rgba(168, 85, 247, 0.5); background-color: #2b2b2b; color: white; }
+        .btn-purple { background-color: #a855f7; color: white; border: none; font-weight: bold; width: 100%; transition: 0.3s; }
+        .btn-purple:hover { background-color: #9333ea; color: white; transform: scale(1.02); }
+        .auth-links { text-align: center; margin-top: 20px; font-size: 0.9em; }
+        .auth-links a { color: #a855f7; text-decoration: none; transition: 0.2s; }
+        .auth-links a:hover { color: #d8b4fe; text-decoration: underline; }
+        /* Centralizar o reCAPTCHA */
+        .recaptcha-container { display: flex; justify-content: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h2 class="auth-title">NOVO PACTO</h2>
+        <form onsubmit="registrarPacto(event)">
+            <div class="mb-3">
+                <label class="form-label text-muted">Usuário</label>
+                <input type="text" id="nomeUsuario" class="form-control bg-dark text-light border-secondary" placeholder="Como seremos chamados?" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-muted">E-mail</label>
+                <input type="email" id="email" class="form-control bg-dark text-light border-secondary" placeholder="seu@email.com" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label text-muted">Senha</label>
+                <input type="password" id="senha" class="form-control bg-dark text-light border-secondary" placeholder="Crie uma senha forte" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-muted">Confirme a Senha</label>
+                <input type="password" id="confirmaSenha" class="form-control bg-dark text-light border-secondary" placeholder="Repita a senha" required>
+            </div>
+
+            <div class="recaptcha-container">
+                <div class="g-recaptcha" data-sitekey="SUA_CHAVE_DE_SITE_AQUI" data-theme="dark"></div>
+            </div>
+            
+            <button type="submit" class="btn btn-purple btn-lg">Firmar Registro</button>
+        </form>
+
+        <div class="auth-links">
+            <span>Já tem um registro ativo?</span> <a href="login.html">Faça login</a>
+        </div>
+    </div>
+
+<script>
+        async function registrarPacto(event) {
+            event.preventDefault(); // Impede a página de piscar/recarregar
+
+            // 1. Pega os valores que o usuário digitou
+            const nome = document.getElementById('nomeUsuario').value;
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const confirma = document.getElementById('confirmaSenha').value;
+
+            // 2. Verifica se as senhas são iguais
+            if (senha !== confirma) {
+                alert("As senhas não coincidem!");
+                return; // Para a execução aqui
+            }
+
+            // 3. Monta o "pacote" de dados com os mesmos nomes que usamos lá na classe Usuario do Java
+            const dadosUsuario = {
+                nomeUsuario: nome,
+                email: email,
+                senha: senha
+            };
+
+            try {
+                // 4. Faz a "ligação" para o nosso servidor Java (O Controller)
+                const resposta = await fetch('/api/usuarios/registrar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosUsuario) // Transforma em formato JSON para viajar pela internet
+                });
+
+                // 5. Verifica se o Java respondeu com sucesso
+                if (resposta.ok) {
+                    const textoRetorno = await resposta.text();
+                    alert(textoRetorno); // Mostra o "Registro recebido com sucesso!"
+                    window.location.href = "login.html"; // Manda o usuário para a tela de login
+                } else {
+                    alert("Algo deu errado ao firmar o pacto...");
+                }
+            } catch (erro) {
+                console.error(erro);
+                alert("O servidor do PACTOS está offline.");
+            }
+        }
+    </script>
+
+</body>
+</html>

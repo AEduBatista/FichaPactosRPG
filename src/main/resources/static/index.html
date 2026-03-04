@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACTOS - Ficha de Personagem</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #121212; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .ficha-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        /* Estilização das barras de status */
+        .bar-container { position: relative; height: 30px; background-color: #2b2b2b; border-radius: 5px; margin-bottom: 15px; overflow: hidden; border: 1px solid #444; }
+        .bar-fill { height: 100%; transition: width 0.3s ease; }
+        .bar-text { position: absolute; width: 100%; text-align: center; font-weight: bold; line-height: 30px; text-shadow: 1px 1px 2px black; pointer-events: none; }
+        .bg-vida { background-color: #dc3545; }
+        .bg-sanidade { background-color: #0d6efd; }
+        .bg-energia { background-color: #ffc107; color: black; text-shadow: none; }
+        /* Estilização dos Atributos */
+        .atributo-box { text-align: center; background: #1e1e1e; padding: 15px; border-radius: 10px; border: 1px solid #333; }
+        .atributo-input { width: 60px; text-align: center; font-size: 1.5rem; font-weight: bold; border: none; background: transparent; color: white; border-bottom: 2px solid #555; }
+        /* Estilos para as listas e botões roxos (Baseado na imagem) */
+        .btn-purple { background-color: #a855f7; color: white; border: none; font-weight: bold; }
+        .btn-purple:hover { background-color: #9333ea; color: white; }
+        .btn-outline-purple { color: #a855f7; border-color: #a855f7; background: transparent; }
+        .btn-outline-purple:hover { background-color: #a855f7; color: white; }
+        
+        .search-line { border: none; border-bottom: 1px solid #555; background: transparent; color: white; border-radius: 0; padding-left: 0; width: 100%; }
+        .search-line:focus { outline: none; box-shadow: none; border-color: #a855f7; background: transparent; color: white;}
+        
+        .item-list-box { background-color: #1a1a1a; border-radius: 5px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .item-header { padding: 12px 15px; cursor: pointer; display: flex; align-items: center; color: #e0e0e0; transition: background 0.2s; border-radius: 5px; }
+        .item-header:hover { background-color: #252525; }
+        .item-body { padding: 15px; border-top: 1px solid #333; background-color: #151515; display: none; border-radius: 0 0 5px 5px; }
+        .item-title-input { background: transparent; border: none; color: white; font-weight: bold; width: 100%; outline: none; }
+        .item-title-input:focus { border-bottom: 1px solid #a855f7; }
+        .chevron { transition: transform 0.3s ease; margin-right: 15px; color: #a855f7; font-weight: bold; }
+        /* Estilos da Tabela de Perícias */
+        .pericias-header { display: flex; font-weight: bold; border-bottom: 2px solid #444; padding-bottom: 5px; margin-bottom: 10px; font-size: 0.9em; text-transform: uppercase; color: #aaa; }
+        .pericia-row { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid #2b2b2b; transition: background 0.2s; }
+        .pericia-row:hover { background-color: #1a1a1a; }
+        .pericia-nome { flex: 3; color: #3b82f6; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .pericia-atb { flex: 2; color: #888; text-align: center; font-size: 0.85em; }
+        .pericia-treino { flex: 1.5; display: flex; justify-content: center; }
+        
+        /* Seletor dropdown para o nível de treino */
+        .pericia-treino select { background-color: #1e1e1e; color: white; border: 1px solid #444; border-radius: 4px; padding: 2px 5px; outline: none; cursor: pointer; }
+        .pericia-treino select:focus { border-color: #a855f7; }
+        
+        .pericia-bonus { flex: 1.5; display: flex; justify-content: center; }
+        .pericia-bonus input { width: 40px; background: transparent; border: none; border-bottom: 1px solid #555; color: white; text-align: center; outline: none; }
+        .pericia-bonus input:focus { border-bottom-color: #a855f7; }
+        .pericia-total { flex: 1.5; text-align: center; font-weight: bold; color: white; border-bottom: 1px solid #3b82f6; }
+        /* Estilo para o botão Home na Header */
+        .btn-home {
+            position: absolute;
+            right: 0;
+            color: #a855f7;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .btn-home:hover {
+            color: #d8b4fe;
+            transform: scale(1.1);
+        }
+        .btn-home svg {
+            width: 35px;
+            height: 35px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ficha-container">
+   <div class="position-relative d-flex justify-content-center align-items-center border-bottom pb-2 mb-4">
+        <h2 class="m-0">Sistema PACTOS</h2>
+        
+        <a href="fichas.html" class="btn-home" title="Voltar para Meus Agentes">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,3L2,12H5V20H19V12H22L12,3M10,18V12H14V18H10Z"></path>
+            </svg>
+        </a>
+
+        <button onclick="salvarFicha()" class="btn btn-purple btn-sm position-absolute" style="right: 50px;"> Salvar Ficha </button>
+    </div>
+
+   <div class="row g-3 mb-4 bg-dark p-3 rounded border border-secondary">
+        <div class="col-md-3">
+            <label class="form-label">Nome do Personagem</label>
+            <input type="text" id="ficha-nome" class="form-control" placeholder="Ex: Investigador">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Jogador</label>
+            <input type="text" id="ficha-jogador" class="form-control" placeholder="Seu nome">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Origem</label>
+            <input type="text" id="ficha-origem" class="form-control" placeholder="Ex: Acadêmico">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Nível</label>
+            <input type="number" id="ficha-nivel" class="form-control" value="0">
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <h4 class="text-center mb-3">Atributos</h4>
+            <div class="row g-2">
+                <div class="col-4"><div class="atributo-box"><label class="d-block small">WILL</label><input type="number" id="attr-will" class="atributo-input" value="0"></div></div>
+                <div class="col-4"><div class="atributo-box"><label class="d-block small">AGI</label><input type="number" id="attr-agi" class="atributo-input" value="0"></div></div>
+                <div class="col-4"><div class="atributo-box"><label class="d-block small">INT</label><input type="number" id="attr-int" class="atributo-input" value="0"></div></div>
+                <div class="col-4"><div class="atributo-box"><label class="d-block small">RIG</label><input type="number" id="attr-rig" class="atributo-input" value="0"></div></div>
+                <div class="col-4"><div class="atributo-box"><label class="d-block small">CAR</label><input type="number" id="attr-car" class="atributo-input" value="0"></div></div>
+                <div class="col-4"><div class="atributo-box"><label class="d-block small">CON</label><input type="number" id="attr-con" class="atributo-input" value="0"></div></div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h4 class="text-center mb-3">Status</h4>
+            <div class="bar-container d-flex align-items-center">
+                <div class="bar-fill bg-vida" id="barra-vida" style="width: 100%;"></div>
+                <div class="bar-text" id="texto-vida">Pontos de Vida (PV) - 10/10</div>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <input type="number" id="atual-vida" class="form-control w-25" placeholder="Atual" value="10" oninput="atualizarBarra('vida')">
+                <input type="number" id="maximo-vida" class="form-control w-25" placeholder="Máximo" value="10" oninput="atualizarBarra('vida')">
+            </div>
+
+            <div class="bar-container d-flex align-items-center">
+                <div class="bar-fill bg-sanidade" id="barra-sanidade" style="width: 100%;"></div>
+                <div class="bar-text" id="texto-sanidade">Sanidade (SAN) - 70/70</div>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <input type="number" id="atual-sanidade" class="form-control w-25" placeholder="Atual" value="70" oninput="atualizarBarra('sanidade')">
+                <input type="number" id="maximo-sanidade" class="form-control w-25" placeholder="Máximo" value="70" oninput="atualizarBarra('sanidade')">
+            </div>
+
+            <div class="bar-container d-flex align-items-center">
+                <div class="bar-fill bg-energia" id="barra-energia" style="width: 100%;"></div>
+                <div class="bar-text" id="texto-energia">Energia Vital (EV) - 1/1</div>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <input type="number" id="atual-energia" class="form-control w-25" placeholder="Atual" value="1" oninput="atualizarBarra('energia')">
+                <input type="number" id="maximo-energia" class="form-control w-25" placeholder="Máximo" value="1" oninput="atualizarBarra('energia')">
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" id="fichaTabs" role="tablist">
+        <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pericias" type="button" role="tab">Perícias</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#pactos" type="button" role="tab">Pactos</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#inventario" type="button" role="tab">Inventário</button></li>
+    </ul>
+
+    <div class="tab-content p-3 border border-top-0 border-secondary rounded-bottom bg-dark" id="fichaTabsContent">
+        <div class="tab-pane fade show active" id="pericias" role="tabpanel">
+            <div class="pericias-header">
+            <div style="flex: 3;">Perícia</div>
+            <div style="flex: 2; text-align: center;">Atributo</div>
+            <div style="flex: 1.5; text-align: center;">Treino</div>
+            <div style="flex: 1.5; text-align: center;">Bônus</div>
+            <div style="flex: 1.5; text-align: center;">Total</div>
+        </div>
+        
+        <div id="lista-pericias"></div>
+        </div>
+        <div class="tab-pane fade" id="pactos" role="tabpanel">
+           <div class="d-flex justify-content-between align-items-end mb-4">
+            <div class="w-50">
+                <input type="text" class="search-line" placeholder="Filtrar habilidades">
+            </div>
+            <div class="d-flex flex-column align-items-end">
+                <button class="btn btn-purple btn-sm mb-2" onclick="adicionarItem('pactos')">Adicionar</button>
+                <button class="btn btn-outline-purple btn-sm" onclick="adicionarItem('pactos')">Nova Habilidade</button>
+            </div>
+        </div>
+        
+        <div id="lista-pactos"></div>
+        </div>
+        <div class="tab-pane fade" id="inventario" role="tabpanel">
+           <div class="d-flex justify-content-between align-items-end mb-4">
+            <div class="w-50">
+                <input type="text" class="search-line" placeholder="Filtrar habilidades">
+            </div>
+            <div class="d-flex flex-column align-items-end">
+                <button class="btn btn-purple btn-sm mb-2" onclick="adicionarItem('inventario')">Adicionar</button>
+                <button class="btn btn-outline-purple btn-sm" onclick="adicionarItem('inventario')">Nova Habilidade</button>
+            </div>
+        </div>
+        
+        <div id="lista-inventario"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Função para adicionar um novo item na aba correta
+    function adicionarItem(abaId) {
+        const container = document.getElementById(`lista-${abaId}`);
+        const itemId = Date.now(); // Gera um ID único para o item
+        
+        // Estrutura HTML do novo item
+        const itemHTML = `
+            <div class="item-list-box" id="item-${itemId}">
+                <div class="item-header" onclick="toggleItem(${itemId})">
+                    <span class="chevron" id="chevron-${itemId}">v</span>
+                    <input type="text" class="item-title-input" value="Nova Habilidade" onclick="event.stopPropagation()">
+                </div>
+                <div class="item-body" id="body-${itemId}">
+                    <textarea class="form-control bg-dark text-white border-secondary mb-3" rows="3" placeholder="Descreva os efeitos e regras aqui..."></textarea>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-sm btn-danger" onclick="removerItem(${itemId})">Excluir</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Adiciona o item no final da lista
+        container.insertAdjacentHTML('beforeend', itemHTML);
+    }
+
+    // Função para abrir/fechar o item (Accordion)
+    function toggleItem(id) {
+        const body = document.getElementById(`body-${id}`);
+        const chevron = document.getElementById(`chevron-${id}`);
+        
+        if (body.style.display === 'block') {
+            body.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        } else {
+            body.style.display = 'block';
+            chevron.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // Função para deletar o item
+    function removerItem(id) {
+        document.getElementById(`item-${id}`).remove();
+    }
+
+    // Lista completa de perícias e atributos baseada na sua tabela do PACTOS
+    const periciasBase = [
+        { nome: "Atletismo", atb: "CON / WILL" },
+        { nome: "Atualidades", atb: "INT / CAR" },
+        { nome: "Atuação", atb: "INT / CAR" },
+        { nome: "Ciências", atb: "INT" },
+        { nome: "Diplomacia", atb: "INT / CAR" },
+        { nome: "Enganação", atb: "INT / CAR" },
+        { nome: "Fortitude", atb: "CON / WILL" },
+        { nome: "Furtividade", atb: "AGI" },
+        { nome: "Iniciativa", atb: "AGI" },
+        { nome: "Intimidação", atb: "INT / CAR" },
+        { nome: "Intuição", atb: "INT" },
+        { nome: "Investigação", atb: "INT / WILL" },
+        { nome: "Medicina", atb: "INT / WILL" },
+        { nome: "Lábia", atb: "CAR / AGI" },
+        { nome: "Luta", atb: "RIG / WILL" },
+        { nome: "Pilotagem", atb: "AGI / WILL" },
+        { nome: "Pontaria", atb: "AGI / WILL" },
+        { nome: "Profissão", atb: "INT" },
+        { nome: "Percepção", atb: "AGI / WILL" },
+        { nome: "Persuasão", atb: "CAR / INT" },
+        { nome: "Prestidigitação", atb: "AGI / CAR" },
+        { nome: "Reflexo", atb: "AGI / WILL" },
+        { nome: "Religião", atb: "INT / WILL" },
+        { nome: "Sobrevivência", atb: "INT / WILL" },
+        { nome: "Tática", atb: "INT" },
+        { nome: "Tecnologia", atb: "INT" },
+        { nome: "Vontade", atb: "WILL" }
+    ];
+
+    // Função para gerar as perícias na tela
+    function renderizarPericias() {
+        const container = document.getElementById('lista-pericias');
+        let html = '';
+        periciasBase.forEach((p, index) => {
+            html += `
+            <div class="pericia-row">
+                <div class="pericia-nome">🎲 ${p.nome}</div>
+                <div class="pericia-atb">( ${p.atb} )</div>
+                <div class="pericia-treino">
+                    <select id="treino-${index}" onchange="calcularPericia(${index})">
+                        <option value="0">0</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="pericia-bonus">
+                    <input type="number" id="bonus-${index}" value="0" oninput="calcularPericia(${index})">
+                </div>
+                <div class="pericia-total" id="total-${index}">0</div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    // Calcula a soma (Treino + Bônus) em tempo real
+    function calcularPericia(index) {
+        const treino = parseInt(document.getElementById(`treino-${index}`).value) || 0;
+        const bonus = parseInt(document.getElementById(`bonus-${index}`).value) || 0;
+        document.getElementById(`total-${index}`).innerText = treino + bonus;
+    }
+
+    // Executa a função para carregar a lista assim que a página abrir
+    renderizarPericias();
+
+    // Função para calcular e atualizar o tamanho e o texto das barras de status
+    function atualizarBarra(tipo) {
+        // Pega os valores digitados (se estiver vazio, assume 0 para atual e 1 para máximo)
+        const atual = parseInt(document.getElementById(`atual-${tipo}`).value) || 0;
+        const maximo = parseInt(document.getElementById(`maximo-${tipo}`).value) || 1;
+        
+        // Calcula a porcentagem
+        let porcentagem = (atual / maximo) * 100;
+        
+        // Trava a barra visualmente entre 0% e 100% (para o preenchimento não sair do limite)
+        if (porcentagem > 100) porcentagem = 100;
+        if (porcentagem < 0) porcentagem = 0;
+
+        // Atualiza a largura da cor (CSS)
+        document.getElementById(`barra-${tipo}`).style.width = `${porcentagem}%`;
+        
+        // Atualiza o texto que fica no meio da barra
+        let nomeStatus = '';
+        if (tipo === 'vida') nomeStatus = 'Pontos de Vida (PV)';
+        if (tipo === 'sanidade') nomeStatus = 'Sanidade (SAN)';
+        if (tipo === 'energia') nomeStatus = 'Energia Vital (EV)';
+        
+        document.getElementById(`texto-${tipo}`).innerText = `${nomeStatus} - ${atual}/${maximo}`;
+    }
+</script>
+
+<script>
+
+    // Função que lê a tela e cria o pacote
+        function empacotarLista(abaId) {
+            const container = document.getElementById(`lista-${abaId}`);
+            const itens = container.querySelectorAll('.item-list-box');
+            let pacote = [];
+            itens.forEach(item => {
+                const titulo = item.querySelector('.item-title-input').value;
+                const descricao = item.querySelector('textarea').value;
+                pacote.push({ titulo, descricao });
+            });
+            return JSON.stringify(pacote);
+        }
+
+        // Função que abre o pacote do banco de dados e desenha na tela
+        function desempacotarLista(abaId, dadosJson) {
+            if (!dadosJson) return; // Se estiver vazio, não faz nada
+            
+            const itensSalvos = JSON.parse(dadosJson);
+            const container = document.getElementById(`lista-${abaId}`);
+            container.innerHTML = ''; // Limpa a lista antes de desenhar
+            
+            itensSalvos.forEach(item => {
+                const itemId = Date.now() + Math.random().toString().substring(2, 8); // Cria um ID único
+                const itemHTML = `
+                    <div class="item-list-box" id="item-${itemId}">
+                        <div class="item-header" onclick="toggleItem('${itemId}')">
+                            <span class="chevron" id="chevron-${itemId}">v</span>
+                            <input type="text" class="item-title-input" value="${item.titulo}" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="item-body" id="body-${itemId}">
+                            <textarea class="form-control bg-dark text-white border-secondary mb-3" rows="3">${item.descricao}</textarea>
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-sm btn-danger" onclick="removerItem('${itemId}')">Excluir</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', itemHTML);
+            });
+        }
+
+        // 1. Descobre qual ficha o jogador clicou lendo o "?id=X" na URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const agenteId = urlParams.get('id');
+
+        // Segurança: Verifica se tem alguém logado e se um ID foi passado
+        const usuarioLogado = localStorage.getItem('usuarioLogado');
+        if (!usuarioLogado || !agenteId) {
+            alert("Acesso negado. Retornando ao painel.");
+            window.location.href = "fichas.html";
+        }
+
+       // 2. Carrega os dados do MySQL e preenche a tela
+        async function carregarDadosDaFicha() {
+            try {
+                const resposta = await fetch(`/api/agentes/${agenteId}`);
+                if (resposta.ok) {
+                    const ficha = await resposta.json();
+                    
+                    const preencherSeExistir = (id, valor) => {
+                        const elemento = document.getElementById(id);
+                        if (elemento) elemento.value = valor;
+                    };
+
+                    // Preenche Cabeçalho
+                    preencherSeExistir('ficha-nome', ficha.nome);
+                    preencherSeExistir('ficha-jogador', ficha.jogador);
+                    preencherSeExistir('ficha-origem', ficha.origem);
+                    preencherSeExistir('ficha-nivel', ficha.nivel);
+
+                    // Preenche Barras
+                    preencherSeExistir('atual-vida', ficha.vidaAtual);
+                    preencherSeExistir('maximo-vida', ficha.vidaMaxima);
+                    preencherSeExistir('atual-sanidade', ficha.sanidadeAtual);
+                    preencherSeExistir('maximo-sanidade', ficha.sanidadeMaxima);
+                    preencherSeExistir('atual-energia', ficha.energiaAtual);
+                    preencherSeExistir('maximo-energia', ficha.energiaMaxima);
+
+                    atualizarBarra('vida');
+                    atualizarBarra('sanidade');
+                    atualizarBarra('energia');
+
+                    // DESEMPACOTAR PERÍCIAS (Mágica acontece aqui)
+                    if (ficha.periciasDados) {
+                        const periciasSalvas = JSON.parse(ficha.periciasDados);
+                        periciasSalvas.forEach((pericia, index) => {
+                            const selectTreino = document.getElementById(`treino-${index}`);
+                            const inputBonus = document.getElementById(`bonus-${index}`);
+                            
+                            if (selectTreino) selectTreino.value = pericia.treino;
+                            if (inputBonus) inputBonus.value = pericia.bonus;
+                            
+                            calcularPericia(index); // Atualiza a soma na tela
+                        });
+                    }
+                    
+                    // DESEMPACOTAR PACTOS E INVENTÁRIO
+                    desempacotarLista('pactos', ficha.pactosDados);
+                    desempacotarLista('inventario', ficha.inventarioDados);
+
+                    // Preenche Atributos
+                    preencherSeExistir('attr-will', ficha.will);
+                    preencherSeExistir('attr-agi', ficha.agilidade);
+                    preencherSeExistir('attr-int', ficha.inteligencia);
+                    preencherSeExistir('attr-rig', ficha.forca);
+                    preencherSeExistir('attr-car', ficha.presenca);
+                    preencherSeExistir('attr-con', ficha.vigor);
+
+                } else {
+                    alert("Ficha não encontrada no banco de dados.");
+                }
+            } catch (erro) {
+                console.error("Erro ao carregar a ficha:", erro);
+            }
+        }
+
+        // 3. Pega tudo que o jogador alterou e salva no MySQL
+        async function salvarFicha() {
+            const pegarValor = (id, tipoNum = true) => {
+                const elemento = document.getElementById(id);
+                if (elemento) return elemento.value;
+                return tipoNum ? 0 : ""; 
+            };
+
+            // EMPACOTAR PERÍCIAS: Varre de 0 a 26 e cria um pacote
+            let pacotePericias = [];
+            for (let i = 0; i < 27; i++) {
+                pacotePericias.push({
+                    treino: pegarValor(`treino-${i}`),
+                    bonus: pegarValor(`bonus-${i}`)
+                });
+            }
+
+            const dadosAtualizados = {
+                nome: pegarValor('ficha-nome', false),
+                jogador: pegarValor('ficha-jogador', false),
+                origem: pegarValor('ficha-origem', false),
+                nivel: pegarValor('ficha-nivel'),
+                
+                vidaAtual: pegarValor('atual-vida'),
+                vidaMaxima: pegarValor('maximo-vida'),
+                sanidadeAtual: pegarValor('atual-sanidade'),
+                sanidadeMaxima: pegarValor('maximo-sanidade'),
+                energiaAtual: pegarValor('atual-energia'),
+                energiaMaxima: pegarValor('maximo-energia'),
+                
+                // O pacote de perícias vai aqui, transformado em texto!
+                periciasDados: JSON.stringify(pacotePericias),
+
+                // AS DUAS LINHAS NOVAS:
+                pactosDados: empacotarLista('pactos'),
+                inventarioDados: empacotarLista('inventario'),
+                
+                will: pegarValor('attr-will'),
+                agilidade: pegarValor('attr-agi'),
+                inteligencia: pegarValor('attr-int'),
+                forca: pegarValor('attr-rig'),
+                presenca: pegarValor('attr-car'),
+                vigor: pegarValor('attr-con')
+            };
+
+            try {
+                const resposta = await fetch(`/api/agentes/atualizar/${agenteId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosAtualizados)
+                });
+
+                if (resposta.ok) {
+                    alert("Progresso da sessão salvo com sucesso!");
+                } else {
+                    alert("Erro ao salvar a ficha.");
+                }
+            } catch (erro) {
+                console.error("Erro ao salvar:", erro);
+                alert("O servidor está offline.");
+            }
+        }
+    
+        // Executa o carregamento assim que a página abre
+        carregarDadosDaFicha();
+    </script>
+
+</body>
+</html>

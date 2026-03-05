@@ -2,6 +2,7 @@ package com.ficharpg.pactos.controller;
 
 import com.ficharpg.pactos.model.Usuario;
 import com.ficharpg.pactos.repository.UsuarioRepository;
+import com.ficharpg.pactos.service.RecaptchaService; // Import do nosso novo guardião
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,26 +12,36 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
 
-    // O @Autowired "injeta" o nosso Guardião do Banco de Dados aqui para podermos usá-lo
+    // O @Autowired "injeta" o nosso Guardião do Banco de Dados
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @PostMapping("/registrar")
-    public String registrarUsuario(@RequestBody Usuario novoUsuario) {
+    // O @Autowired "injeta" o nosso Interfone com o Google
+    @Autowired
+    private RecaptchaService recaptchaService;
 
+    @PostMapping("/registrar")
+    public ResponseEntity<String> registrarUsuario(
+            @RequestBody Usuario novoUsuario,
+            @RequestParam("g-recaptcha-response") String tokenCaptcha) {
+
+        // 1. A PRIMEIRA COISA É PERGUNTAR PRO GOOGLE SE É HUMANO
+        boolean isHumano = recaptchaService.verificarCaptcha(tokenCaptcha);
+
+        if (!isHumano) {
+            // Se o Google barrar, devolvemos erro 403 (Proibido)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Falha na verificação do reCAPTCHA. Você é um robô?");
+        }
+
+        // 2. Se for humano, tenta salvar no banco normalmente
         try {
-            // Este é o comando mágico que pega as informações do HTML e joga dentro da tabela do MySQL!
             usuarioRepository.save(novoUsuario);
-            return "Pacto firmado! Seus dados foram salvos nos registros.";
+            return ResponseEntity.ok("Pacto firmado! Seus dados foram salvos nos registros.");
         } catch (Exception e) {
-            // Se o email ou usuário já existir (pois colocamos a regra unique = true na classe), ele cai aqui
-            return "Erro: O nome de usuário ou e-mail já estão em uso.";
+            // Se o email ou usuário já existir (regra unique = true)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro: O nome de usuário ou e-mail já estão em uso.");
         }
     }
-
-    // Importe isto lá no topo do arquivo se o IntelliJ pedir (Alt + Enter no ResponseEntity):
-    // import org.springframework.http.ResponseEntity;
-    // import org.springframework.http.HttpStatus;
 
     @PostMapping("/login")
     public ResponseEntity<String> fazerLogin(@RequestBody Usuario dadosLogin) {
@@ -53,7 +64,7 @@ public class UsuarioController {
     public ResponseEntity<Usuario> buscarUsuario(@PathVariable String nomeUsuario) {
         Usuario usuario = usuarioRepository.findByNomeUsuario(nomeUsuario);
         if (usuario != null) {
-            return ResponseEntity.ok(usuario); // Devolve todos os dados do jogador (email, nome, etc)
+            return ResponseEntity.ok(usuario); // Devolve todos os dados do jogador
         }
         return ResponseEntity.notFound().build();
     }
@@ -77,6 +88,4 @@ public class UsuarioController {
             usuarioRepository.save(usuarioBanco); // Salva as alterações no MySQL
             return ResponseEntity.ok("Perfil atualizado com sucesso!");
         }
-        return ResponseEntity.notFound().build();
-    }
-}
+        return ResponseEntity.notFound().

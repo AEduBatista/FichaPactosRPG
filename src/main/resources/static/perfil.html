@@ -260,9 +260,9 @@
                     const erro = await resposta.text();
                     alert(erro);
                 }
-            } catch (erro) {
-                console.error(erro);
-                alert("O servidor está offline.");
+            }  catch (erro) {
+            console.error(erro);
+            alert("O erro real é: " + erro.message);
             }
         }
 

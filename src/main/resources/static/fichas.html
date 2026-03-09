@@ -166,7 +166,7 @@
 
     <nav class="pactos-nav">
         <div class="d-flex gap-2">
-            <button class="nav-link active">Agentes</button>
+            <button class="nav-link active">Personagens</button>
             <button class="nav-link inactive" disabled>Campanhas (Em breve)</button>
         </div>
     </nav>
@@ -174,9 +174,9 @@
     <main class="pactos-main">
         
         <div class="action-bar">
-            <div class="agentes-count" id="contador-agentes">Agentes: 0/15</div>
+            <div class="agentes-count" id="contador-agentes">Personagens: 0/15</div>
             <div class="d-flex gap-3 align-items-center">
-                <input type="text" class="search-line" placeholder="Filtrar agentes...">
+                <input type="text" class="search-line" placeholder="Filtrar personagens...">
                 <button class="btn btn-purple" onclick="criarAgente()">Novo Agente</button>
             </div>
         </div>
@@ -185,7 +185,7 @@
             
             <div class="ficha-card novo-card" id="btn-add-card" onclick="criarAgente()">
                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"></path></svg>
-                 <div>Criar Novo Agente</div>
+                 <div>Criar Novo Personagens</div>
             </div>
 
         </div>
@@ -220,7 +220,7 @@
             // Renderiza cada agente salvo no banco
             agentes.forEach(agente => renderizarCarta(agente));
         } catch (erro) {
-            console.error("Erro ao carregar agentes:", erro);
+            console.error("Erro ao carregar personagens:", erro);
         }
     }
 
@@ -274,7 +274,7 @@
     // Pede pro Java criar uma ficha nova no banco
     async function criarAgente() {
         if (totalAgentes >= maxAgentes) {
-            alert("Limite máximo de agentes atingido!");
+            alert("Limite máximo de personagens atingido!");
             return;
         }
 
@@ -287,7 +287,7 @@
                 atualizarContador();
             }
         } catch (erro) {
-            console.error("Erro ao criar agente:", erro);
+            console.error("Erro ao criar personagem:", erro);
         }
     }
 

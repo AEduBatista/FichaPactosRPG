@@ -33,7 +33,7 @@
         <form onsubmit="registrarPacto(event)">
             <div class="mb-3">
                 <label class="form-label text-muted">Usuário</label>
-                <input type="text" id="nomeUsuario" class="form-control bg-dark text-light border-secondary" placeholder="Como seremos chamados?" required>
+                <input type="text" id="nomeUsuario" class="form-control bg-dark text-light border-secondary" placeholder="Qual será seu usuário?" required>
             </div>
 
             <div class="mb-3">
@@ -86,7 +86,7 @@
 
             // Se o token estiver vazio, a pessoa não clicou na caixa!
             if (!tokenDoGoogle) {
-                alert("Por favor, prove que você não é um robô do Culto de Sangue marcando a caixinha!");
+                alert("Por favor, prove que você não é um infiltrado na Igreja marcando a caixinha!");
                 return;
             }
             // ==============================================================

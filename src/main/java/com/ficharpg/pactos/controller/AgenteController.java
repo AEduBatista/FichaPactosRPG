@@ -5,8 +5,10 @@ import com.ficharpg.pactos.model.Usuario;
 import com.ficharpg.pactos.repository.AgenteRepository;
 import com.ficharpg.pactos.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,41 +23,49 @@ public class AgenteController {
 
     // Criar uma ficha nova em branco para o jogador
     @PostMapping("/criar/{nomeUsuario}")
-    public Agente criarAgente(@PathVariable String nomeUsuario) {
+    public ResponseEntity<Agente> criarAgente(@PathVariable String nomeUsuario) {
         Usuario dono = usuarioRepository.findByNomeUsuario(nomeUsuario);
         if (dono != null) {
             Agente novoAgente = new Agente();
             novoAgente.setUsuario(dono);
-            return agenteRepository.save(novoAgente); // Salva no MySQL e devolve os dados
+            novoAgente.setNome("Novo Agente");
+            novoAgente.setNivel(0);
+            novoAgente.setOrigem("Desconhecida");
+            return ResponseEntity.ok(agenteRepository.save(novoAgente));
         }
-        return null;
+        return ResponseEntity.badRequest().build();
     }
 
     // Listar todas as fichas do jogador quando ele abre a página
     @GetMapping("/listar/{nomeUsuario}")
-    public List<Agente> listarAgentes(@PathVariable String nomeUsuario) {
+    public ResponseEntity<List<Agente>> listarAgentes(@PathVariable String nomeUsuario) {
         Usuario dono = usuarioRepository.findByNomeUsuario(nomeUsuario);
         if (dono != null) {
-            return agenteRepository.findByUsuario(dono);
+            return ResponseEntity.ok(agenteRepository.findByUsuario(dono));
         }
-        return null;
+        return ResponseEntity.ok(new ArrayList<>()); // Devolve uma lista vazia se não achar o dono, evitando o erro JSON
     }
 
     // Excluir a ficha
     @DeleteMapping("/excluir/{id}")
-    public void excluirAgente(@PathVariable Long id) {
+    public ResponseEntity<Void> excluirAgente(@PathVariable Long id) {
         agenteRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     // 1. Buscar UMA ficha específica pelo ID (Para abrir na página index.html)
     @GetMapping("/{id}")
-    public Agente buscarAgentePorId(@PathVariable Long id) {
-        return agenteRepository.findById(id).orElse(null);
+    public ResponseEntity<Agente> buscarAgentePorId(@PathVariable Long id) {
+        Agente agente = agenteRepository.findById(id).orElse(null);
+        if (agente != null) {
+            return ResponseEntity.ok(agente);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     // 2. Guardar as alterações feitas na ficha (Dano, Sanidade, Atributos)
     @PutMapping("/atualizar/{id}")
-    public Agente atualizarFicha(@PathVariable Long id, @RequestBody Agente dadosAtualizados) {
+    public ResponseEntity<Agente> atualizarFicha(@PathVariable Long id, @RequestBody Agente dadosAtualizados) {
         Agente fichaExistente = agenteRepository.findById(id).orElse(null);
 
         if (fichaExistente != null) {
@@ -64,6 +74,9 @@ public class AgenteController {
             fichaExistente.setJogador(dadosAtualizados.getJogador());
             fichaExistente.setOrigem(dadosAtualizados.getOrigem());
             fichaExistente.setNivel(dadosAtualizados.getNivel());
+
+            // AQUI ESTÁ! Ensinando o Java a guardar o link do ImgBB
+            fichaExistente.setFotoUrl(dadosAtualizados.getFotoUrl());
 
             // Atualiza os Status Vitais
             fichaExistente.setVidaAtual(dadosAtualizados.getVidaAtual());
@@ -80,16 +93,16 @@ public class AgenteController {
             fichaExistente.setPresenca(dadosAtualizados.getPresenca());
             fichaExistente.setVigor(dadosAtualizados.getVigor());
             fichaExistente.setWill(dadosAtualizados.getWill());
-            // Atualiza o pacote de perícias
+
+            // Atualiza o pacote de perícias e listas
             fichaExistente.setPericiasDados(dadosAtualizados.getPericiasDados());
-            // Atualiza as listas dinâmicas
             fichaExistente.setPactosDados(dadosAtualizados.getPactosDados());
             fichaExistente.setInventarioDados(dadosAtualizados.getInventarioDados());
+
             // Guarda tudo no MySQL
-            return agenteRepository.save(fichaExistente);
+            return ResponseEntity.ok(agenteRepository.save(fichaExistente));
         }
 
-
-        return null;
+        return ResponseEntity.notFound().build();
     }
 }

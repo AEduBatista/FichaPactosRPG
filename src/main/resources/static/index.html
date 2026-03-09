@@ -457,6 +457,13 @@
                     preencherSeExistir('ficha-origem', ficha.origem);
                     preencherSeExistir('ficha-nivel', ficha.nivel);
 
+                    // --- COLE O NOVO CÓDIGO DA FOTO AQUI ---
+                    if (ficha.fotoUrl) {
+                        linkFotoAgente = ficha.fotoUrl; // Salva o link na memória para não apagar sem querer
+                        document.getElementById('imagemPreview').style.backgroundImage = `url('${ficha.fotoUrl}')`; // Mostra a foto na bolinha!
+                    }
+                    // ---------------------------------------
+
                     // Preenche Barras
                     preencherSeExistir('atual-vida', ficha.vidaAtual);
                     preencherSeExistir('maximo-vida', ficha.vidaMaxima);

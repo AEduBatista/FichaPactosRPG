@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
-        /* IMPORTAÇÃO DAS FONTES OFICIAIS */
+        /* 1. IMPORTAÇÃO DAS FONTES OFICIAIS (.otf) */
         @font-face {
             font-family: 'LeopoldMedium';
             src: url('fonts/Leopold.otf') format('opentype');
@@ -24,6 +24,7 @@
             min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; padding: 20px 0;
         }
 
+        /* Cartão de Registro em tons de Azul Escuro */
         .auth-card {
             background-color: #0f172a;
             padding: 40px;
@@ -41,33 +42,36 @@
             margin-bottom: 30px;
             font-family: 'LeopoldMedium', sans-serif;
             letter-spacing: 1px;
-            font-size: 2rem;
+            font-size: 2.2rem;
         }
 
+        /* Substituindo as cores do Bootstrap pelas de Pactos */
         .form-control {
-            background-color: #080b12;
-            border: 1px solid #1e3a8a;
-            color: white;
+            background-color: #080b12 !important;
+            border: 1px solid #1e3a8a !important;
+            color: white !important;
             transition: 0.3s;
-            font-family: 'BloggerSansRegular', sans-serif;
         }
         .form-control:focus {
-            background-color: #0f172a;
-            border-color: #3b82f6;
-            color: white;
-            box-shadow: 0 0 8px rgba(30, 58, 138, 0.5);
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 8px rgba(30, 58, 138, 0.5) !important;
+            background-color: #0f172a !important;
         }
-        .form-label { color: #94a3b8; }
 
+        .form-label { color: #94a3b8 !important; }
+
+        /* Botão Azul Pactos */
         .btn-blue {
             background-color: #1e3a8a;
             color: white;
             border: none;
             font-family: 'LeopoldMedium', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            width: 100%;
             transition: 0.3s;
+            padding: 10px;
             border-radius: 6px;
-            text-transform: uppercase;
             box-shadow: 0 0 10px rgba(11, 28, 62, 0.5);
         }
         .btn-blue:hover {
@@ -77,63 +81,80 @@
             box-shadow: 0 8px 20px rgba(29, 78, 216, 0.6);
         }
 
-        .text-blue { color: #3b82f6 !important; text-decoration: none; transition: 0.3s; }
-        .text-blue:hover { color: #60a5fa !important; text-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
+        .auth-links { text-align: center; margin-top: 20px; font-size: 1rem; }
+        .auth-links a { color: #3b82f6; text-decoration: none; transition: 0.2s; font-weight: bold; }
+        .auth-links a:hover { color: #60a5fa; text-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
+
+        /* Centralizar o reCAPTCHA */
+        .recaptcha-container { display: flex; justify-content: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div class="auth-card">
-    <h2 class="auth-title">CRIAR CONTA</h2>
-
-    <form onsubmit="cadastrarUsuario(event)">
-
+    <h2 class="auth-title">NOVO PACTO</h2>
+    <form onsubmit="registrarPacto(event)">
         <div class="mb-3">
-            <label class="form-label">Nome de Usuário</label>
-            <input type="text" class="form-control" id="nomeReg" required>
+            <label class="form-label">Usuário</label>
+            <input type="text" id="nomeUsuario" class="form-control" placeholder="Qual será seu usuário?" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label">E-mail</label>
-            <input type="email" class="form-control" id="emailReg" required>
+            <input type="email" id="email" class="form-control" placeholder="seu@email.com" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Senha</label>
+            <input type="password" id="senha" class="form-control" placeholder="Crie uma senha forte" required>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">Senha</label>
-            <input type="password" class="form-control" id="senhaReg" required>
+            <label class="form-label">Confirme a Senha</label>
+            <input type="password" id="confirmaSenha" class="form-control" placeholder="Repita a senha" required>
         </div>
 
-        <div class="mb-4 d-flex justify-content-center">
-            <div class="g-recaptcha" data-sitekey="6LdYc-AqAAAAAOL076k7Z2aZ4D8qZ1oD-hH1hFjL" data-theme="dark"></div>
+        <div class="recaptcha-container">
+            <div class="g-recaptcha" data-sitekey="6LflIIAsAAAAAIJVsqpxY5DuG0bGE208uLsv5cEm" data-theme="dark"></div>
         </div>
 
-        <button type="submit" class="btn btn-blue w-100 py-2 mb-3">REGISTRAR</button>
-
-        <div class="text-center mt-3">
-            <span class="text-secondary">Já possui uma conta?</span>
-            <a href="login.html" class="text-blue fw-bold">Faça login</a>
-        </div>
+        <button type="submit" class="btn btn-blue btn-lg">Firmar Registro</button>
     </form>
+
+    <div class="auth-links">
+        <span class="text-secondary">Já tem um registro ativo?</span> <a href="login.html">Faça login</a>
+    </div>
 </div>
 
 <script>
-    async function cadastrarUsuario(event) {
+    async function registrarPacto(event) {
         event.preventDefault();
 
-        // 1. Pega os dados dos campos de texto
-        const nome = document.getElementById('nomeReg').value;
-        const email = document.getElementById('emailReg').value;
-        const senha = document.getElementById('senhaReg').value;
+        // 1. Pega os valores que o usuário digitou
+        const nome = document.getElementById('nomeUsuario').value;
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+        const confirma = document.getElementById('confirmaSenha').value;
 
-        // 2. Pega a resposta do Google reCAPTCHA
-        const tokenDoGoogle = grecaptcha.getResponse();
-
-        // 3. Verifica se o jogador marcou a caixinha
-        if (!tokenDoGoogle) {
-            alert("Por favor, confirme que você não é um robô!");
+        // 2. Verifica se as senhas são iguais
+        if (senha !== confirma) {
+            alert("As senhas não coincidem!");
             return;
         }
 
+        // ==============================================================
+        // A MÁGICA DO RECAPTCHA ACONTECE AQUI
+        // Pega o código gerado pelo Google quando a pessoa clica na caixa
+        const tokenDoGoogle = grecaptcha.getResponse();
+
+        // Se o token estiver vazio, a pessoa não clicou na caixa!
+        if (!tokenDoGoogle) {
+            alert("Por favor, prove que você não é um infiltrado na Igreja marcando a caixinha!");
+            return;
+        }
+        // ==============================================================
+
+        // 3. Monta o "pacote" de dados com os mesmos nomes que usamos lá na classe Usuario do Java
         const dadosUsuario = {
             nomeUsuario: nome,
             email: email,
@@ -141,7 +162,8 @@
         };
 
         try {
-            // 4. Envia os dados e o "token" para o nosso servidor Java
+            // 4. Faz a "ligação" para o nosso servidor Java
+            // Repare que agora penduramos o tokenDoGoogle no final da URL!
             const urlComToken = `/api/usuarios/registrar?g-recaptcha-response=${encodeURIComponent(tokenDoGoogle)}`;
 
             const resposta = await fetch(urlComToken, {
@@ -149,7 +171,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(dadosUsuario)
+                body: JSON.stringify(dadosUsuario) // Transforma em formato JSON
             });
 
             // 5. Verifica a resposta do Java
@@ -160,10 +182,11 @@
                 window.location.href = "login.html"; // Manda o usuário para a tela de login
             } else if (resposta.status === 403) {
                 alert("O Google detectou uma anomalia (Robô). Tente novamente.");
-                grecaptcha.reset();
+                grecaptcha.reset(); // Reseta a caixinha do captcha
             } else {
+                // Erro 400 cai aqui (ex: nome já existe)
                 alert(textoRetorno);
-                grecaptcha.reset();
+                grecaptcha.reset(); // Reseta a caixinha para ele tentar de novo
             }
         } catch (erro) {
             console.error(erro);

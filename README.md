@@ -57,4 +57,4 @@ Para rodar este projeto na sua máquina para testes ou para mestrar uma sessão:
 
 1. Clone este repositório:
    ```bash
-   git clone [https://github.com/SEU_USUARIO/pactos.git](https://github.com/SEU_USUARIO/pactos.git)
+   git clone [https://github.com/AEduBatista/pactos.git](https://github.com/AEduBatista/pactos.git)
